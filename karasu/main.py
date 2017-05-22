@@ -24,8 +24,5 @@ def run():
 
         manager.run()
 
-    except Exception as e:
-        print(e)
-        sys.exit(1)
-    except (KeyboardInterrupt, RuntimeError, SystemExit) as e:
+    except (KeyboardInterrupt, SystemExit) as e:
         pass
