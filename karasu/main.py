@@ -2,29 +2,30 @@
 
 import os
 import sys
+import signal
 
 import tweepy
 
-from .authenticate import *
-from .stream import *
+from .manager import Manager
 
 
-def main():
+def run():
     """
     [WIP] test place
     """
-    t = tweepy.API(get_authen())
+    try:
+        manager = Manager()
 
-    user = t.verify_credentials()
-    print(user.name)
+        def quit():
+            manager.shutdown()
 
-    for status in tweepy.Cursor(t.user_timeline, screen_name=user.screen_name, count=5).items(5):
-        print(status.text)
+        ctrl_c_handler = lambda signum, frame: quit()
+        signal.signal(signal.SIGINT, ctrl_c_handler)
 
-    listener = BaseStreamListener()
-    stream = tweepy.Stream(t.auth, listener)
-    stream.userstream(async=True)
+        manager.run()
 
-
-if __name__ == '__main__':
-    main()
+    except Exception as e:
+        print(e)
+        sys.exit(1)
+    except (KeyboardInterrupt, RuntimeError, SystemExit) as e:
+        pass
